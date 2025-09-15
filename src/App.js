@@ -1,94 +1,70 @@
-import React, { useState } from "react";
-import {
-  TextField,
-  Button,
-  Card,
-  CardContent,
-  Typography,
-  Box,
-  Alert,
-  Divider,
-} from "@mui/material";
-
-const API_BASE_URL = "https://cathay-demo-account-191169836402.asia-east1.run.app";
+import React, { useState, useEffect } from "react";
+import LoginPage from "./LoginPage";
+import UploadPage from "./UploadPage";
+import { Box, Snackbar, Alert } from "@mui/material";
 
 export default function App() {
-  const [account, setAccount] = useState("");
-  const [password, setPassword] = useState("");
-  const [response, setResponse] = useState(null);
-  const [error, setError] = useState(null);
+  const [userName, setUserName] = useState(localStorage.getItem("userName") || null);
   const [jwtToken, setJwtToken] = useState(localStorage.getItem("jwtToken") || null);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
 
-  const handleLogin = async () => {
-    setError(null);
-    setResponse(null);
-    try {
-      const res = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userName: account, password }),
-      });
-
-      if (!res.ok) {
-        const errText = await res.text();
-        throw new Error(`HTTP ${res.status}: ${errText}`);
-      }
-
-      const data = await res.json();
-      setResponse(data);
-
-      // 取得 JWT 並儲存
-      const token = data.token;
-      if (token) {
-        localStorage.setItem("jwtToken", token);
-        setJwtToken(token);
-      }
-    } catch (err) {
-      setError(err.message);
+  // 當 jwtToken 狀態改變時，將其儲存到 localStorage
+  useEffect(() => {
+    if (jwtToken) {
+      localStorage.setItem("jwtToken", jwtToken);
+    } else {
+      localStorage.removeItem("jwtToken");
     }
-  };
+  }, [jwtToken]);
 
-  const handleFetchProtectedData = async () => {
-    setError(null);
-    setResponse(null);
-
-    // 從 localStorage 取得 JWT
-    const token = localStorage.getItem("jwtToken");
-    if (!token) {
-      setError("No JWT token found. Please log in first.");
-      return;
+  // 當 userName 狀態改變時，將其儲存到 localStorage
+  useEffect(() => {
+    if (userName) {
+      localStorage.setItem("userName", userName);
+    } else {
+      localStorage.removeItem("userName");
     }
+  }, [userName]);
 
-    try {
-      const res = await fetch(`${API_BASE_URL}/test/jwt`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  const handleLoginSuccess = (userName, token) => {
+    setUserName(userName)
+    setJwtToken(token);
 
-      if (!res.ok) {
-        const errText = await res.text();
-        throw new Error(`HTTP ${res.status}: ${errText}`);
-      }
-
-      const data = await res.json();
-      setResponse(data);
-    } catch (err) {
-      setError(err.message);
-    }
+    // 登入成功後顯示提示
+    setSnackbar({
+      open: true,
+      message: `登入成功！歡迎使用，${userName}！`,
+      severity: "success",
+    });
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("jwtToken");
     setJwtToken(null);
-    setAccount("");
-    setPassword("");
-    setResponse(null);
-    setError(null);
+    setSnackbar({
+      open: true,
+      message: "您已成功登出。",
+      severity: "info",
+    });
+  };
+
+  // 統一處理訊息提示的函式
+  const handleShowMessage = (message, severity) => {
+    setSnackbar({
+      open: true,
+      message,
+      severity,
+    });
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbar({ ...snackbar, open: false });
   };
 
   return (
@@ -99,98 +75,31 @@ export default function App() {
       minHeight="100vh"
       bgcolor="#f5f5f5"
     >
-      <Card sx={{ width: 400, borderRadius: 2, boxShadow: 3 }}>
-        <CardContent>
-          <Typography variant="h5" align="center" gutterBottom>
-            Login & JWT Demo
-          </Typography>
-
-          <TextField
-            label="Account"
-            variant="outlined"
-            value={account}
-            onChange={(e) => setAccount(e.target.value)}
-            fullWidth
-            margin="normal"
-          />
-
-          <TextField
-            label="Password"
-            type="password"
-            variant="outlined"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            fullWidth
-            margin="normal"
-          />
-
-          <Box mt={2} display="flex" flexDirection="column" gap={1}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleLogin}
-              fullWidth
-              sx={{ borderRadius: 2 }}
-            >
-              Login
-            </Button>
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={handleFetchProtectedData}
-              fullWidth
-              sx={{ borderRadius: 2 }}
-            >
-              Fetch Protected Data
-            </Button>
-            {jwtToken && (
-              <Button
-                variant="text"
-                color="error"
-                onClick={handleLogout}
-                fullWidth
-                sx={{ borderRadius: 2 }}
-              >
-                Logout
-              </Button>
-            )}
-          </Box>
-
-          <Divider sx={{ my: 2 }} />
-
-          {jwtToken && (
-            <Box mt={2}>
-              <Typography variant="subtitle1" gutterBottom>
-                Current JWT Token:
-              </Typography>
-              <Box
-                sx={{
-                  bgcolor: "#e8f5e9",
-                  p: 1.5,
-                  borderRadius: 2,
-                  wordBreak: "break-all",
-                  whiteSpace: "pre-wrap",
-                }}
-              >
-                {jwtToken}
-              </Box>
-            </Box>
-          )}
-
-          {error && (
-            <Alert severity="error" sx={{ mt: 2, whiteSpace: "pre-wrap" }}>
-              {error}
-            </Alert>
-          )}
-
-          {response && (
-            <Alert severity="success" sx={{ mt: 2, whiteSpace: "pre-wrap" }}>
-              <Typography variant="body1">API Response:</Typography>
-              {JSON.stringify(response, null, 2)}
-            </Alert>
-          )}
-        </CardContent>
-      </Card>
+      {jwtToken ? (
+        <UploadPage
+          userName={userName}
+          jwtToken={jwtToken}
+          onLogout={handleLogout}
+          onShowMessage={handleShowMessage} // 傳遞給 UploadPage
+        />
+      ) : (
+        <LoginPage onLoginSuccess={handleLoginSuccess} />
+      )}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
