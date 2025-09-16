@@ -13,17 +13,52 @@ import {
 export default function LoginPage({ onLoginSuccess }) {
   const [account, setAccount] = useState("");
   const [password, setPassword] = useState("");
+  // 新增狀態來儲存確認密碼
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState(null);
+  const [isRegistering, setIsRegistering] = useState(false);
 
   const handleLogin = async () => {
     setError(null);
     try {
-      console.log(`URL: ${API_BASE_URL}`)
       const res = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({ userName: account, password }),
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`HTTP ${res.status}: ${errText}`);
+      }
+
+      const data = await res.json();
+      const token = data.token;
+      if (token) {
+        onLoginSuccess(token);
+      }
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleRegister = async () => {
+    setError(null);
+    // 在前端檢查兩次密碼是否相符
+    if (password !== confirmPassword) {
+      setError("兩次輸入的密碼不一致，請重新確認。");
+      return; // 如果不符，停止執行
+    }
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/registry`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        // 只傳送帳號和密碼到後端
         body: JSON.stringify({ userName: account, password }),
       });
 
@@ -49,7 +84,7 @@ export default function LoginPage({ onLoginSuccess }) {
           圖片壓縮系統
         </Typography>
         <Typography variant="subtitle1" align="center" gutterBottom>
-          請登入以繼續
+          {isRegistering ? "註冊新帳號" : "請登入以繼續"}
         </Typography>
         <TextField
           label="帳號"
@@ -68,15 +103,38 @@ export default function LoginPage({ onLoginSuccess }) {
           fullWidth
           margin="normal"
         />
+        {/* 註冊模式下顯示確認密碼欄位 */}
+        {isRegistering && (
+          <TextField
+            label="確認密碼"
+            type="password"
+            variant="outlined"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            fullWidth
+            margin="normal"
+          />
+        )}
         <Box mt={2}>
           <Button
             variant="contained"
             color="primary"
-            onClick={handleLogin}
+            onClick={isRegistering ? handleRegister : handleLogin}
             fullWidth
             sx={{ borderRadius: 2 }}
           >
-            登入
+            {isRegistering ? "註冊" : "登入"}
+          </Button>
+        </Box>
+        <Box mt={1} textAlign="center">
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={() => setIsRegistering(!isRegistering)}
+            fullWidth
+            sx={{ borderRadius: 2 }}
+          >
+            {isRegistering ? "返回登入" : "沒有帳號？點此註冊"}
           </Button>
         </Box>
         {error && (
