@@ -6,4 +6,4 @@ export const API_BASE_URL_ACCOUNT = isLocalhost
 
 export const API_BASE_URL_IMAGE = isLocalhost
     ? 'http://localhost:8081'
-    : 'https://cathay-demo-image-191169836402.europe-west1.run.app';
+    : 'https://cathay-demo-image-191169836402.asia-east1.run.app';
