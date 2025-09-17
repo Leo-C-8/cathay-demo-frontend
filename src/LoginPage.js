@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { API_BASE_URL } from './config';
+import { API_BASE_URL_ACCOUNT } from "./config";
 import {
   TextField,
   Button,
@@ -13,7 +13,6 @@ import {
 export default function LoginPage({ onLoginSuccess }) {
   const [account, setAccount] = useState("");
   const [password, setPassword] = useState("");
-  // 新增狀態來儲存確認密碼
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState(null);
   const [isRegistering, setIsRegistering] = useState(false);
@@ -21,7 +20,7 @@ export default function LoginPage({ onLoginSuccess }) {
   const handleLogin = async () => {
     setError(null);
     try {
-      const res = await fetch(`${API_BASE_URL}/auth/login`, {
+      const res = await fetch(`${API_BASE_URL_ACCOUNT}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -46,19 +45,17 @@ export default function LoginPage({ onLoginSuccess }) {
 
   const handleRegister = async () => {
     setError(null);
-    // 在前端檢查兩次密碼是否相符
     if (password !== confirmPassword) {
       setError("兩次輸入的密碼不一致，請重新確認。");
-      return; // 如果不符，停止執行
+      return;
     }
 
     try {
-      const res = await fetch(`${API_BASE_URL}/auth/registry`, {
+      const res = await fetch(`${API_BASE_URL_ACCOUNT}/auth/registry`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        // 只傳送帳號和密碼到後端
         body: JSON.stringify({ userName: account, password }),
       });
 
@@ -103,7 +100,6 @@ export default function LoginPage({ onLoginSuccess }) {
           fullWidth
           margin="normal"
         />
-        {/* 註冊模式下顯示確認密碼欄位 */}
         {isRegistering && (
           <TextField
             label="確認密碼"

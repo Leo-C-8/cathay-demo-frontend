@@ -14,7 +14,7 @@ import {
     Alert,
 } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
-import { API_BASE_URL } from "./config";
+import { API_BASE_URL_IMAGE } from './config';
 
 export default function UploadPage({ jwtToken, onLogout, onShowMessage = () => { } }) {
     const [file, setFile] = useState(null);
@@ -48,7 +48,7 @@ export default function UploadPage({ jwtToken, onLogout, onShowMessage = () => {
             setFile(null);
             setPreviewUrl(null);
             setError("請選擇一個圖片檔案。");
-            onShowMessage("請選擇一個圖片檔案。", "error"); // 使用 onShowMessage
+            onShowMessage("請選擇一個圖片檔案。", "error");
         }
         setUploadProgress(0);
     };
@@ -74,7 +74,7 @@ export default function UploadPage({ jwtToken, onLogout, onShowMessage = () => {
 
         try {
             const xhr = new XMLHttpRequest();
-            xhr.open("POST", `${API_BASE_URL}/images/upload`, true);
+            xhr.open("POST", `${API_BASE_URL_IMAGE}/images/upload`, true);
             xhr.setRequestHeader("Authorization", `Bearer ${jwtToken}`);
 
             xhr.upload.addEventListener("progress", (event) => {
@@ -85,6 +85,12 @@ export default function UploadPage({ jwtToken, onLogout, onShowMessage = () => {
             });
 
             xhr.addEventListener("load", () => {
+                if (xhr.status === 403) {
+                    onLogout();
+                    onShowMessage("您的登入狀態已過期，請重新登入。", "error");
+                    return;
+                }
+
                 if (xhr.status === 200) {
                     onShowMessage("圖片上傳成功！正在處理縮圖...", "success");
                     handleClearFile();
@@ -110,11 +116,17 @@ export default function UploadPage({ jwtToken, onLogout, onShowMessage = () => {
 
     const fetchImageList = async () => {
         try {
-            const res = await fetch(`${API_BASE_URL}/images/list`, {
+            const res = await fetch(`${API_BASE_URL_IMAGE}/images/list`, {
                 headers: {
                     "Authorization": `Bearer ${jwtToken}`,
                 },
             });
+
+            if (res.status === 403) {
+                onLogout();
+                onShowMessage("您的登入狀態已過期，請重新登入。", "error");
+                return;
+            }
 
             if (!res.ok) {
                 throw new Error(`HTTP ${res.status}: ${await res.text()}`);
@@ -224,7 +236,7 @@ export default function UploadPage({ jwtToken, onLogout, onShowMessage = () => {
                             <React.Fragment key={index}>
                                 <ListItem>
                                     <ListItemText
-                                        primary={item.fileName}
+                                        primary={item.originalFileName}
                                         secondary={`
                       大小: ${formatBytes(item.fileSize)} |
                       上傳日期: ${new Date(item.uploadDate).toLocaleDateString()} |

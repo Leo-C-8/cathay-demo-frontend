@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import LoginPage from "./LoginPage";
 import UploadPage from "./UploadPage";
 import { Box, Snackbar, Alert } from "@mui/material";
-import { API_BASE_URL } from "./config";
 
 export default function App() {
   const [jwtToken, setJwtToken] = useState(localStorage.getItem("jwtToken") || null);
