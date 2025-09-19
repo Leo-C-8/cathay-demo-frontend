@@ -1,0 +1,23 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'asia-east1-docker.pkg.dev/golden-medium-471501-p8/cathay-demo-image/cathay-demo-frontend:latest', '.']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'asia-east1-docker.pkg.dev/golden-medium-471501-p8/cathay-demo-image/cathay-demo-frontend:latest']
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      [
+        'run', 'deploy', 'cathay-demo-frontend',
+        '--image=asia-east1-docker.pkg.dev/golden-medium-471501-p8/cathay-demo-image/cathay-demo-frontend:latest',
+        '--region=asia-east1',
+        '--platform=managed',
+        '--allow-unauthenticated'
+      ]
+      
+images:
+  - 'asia-east1-docker.pkg.dev/golden-medium-471501-p8/cathay-demo-image/cathay-demo-frontend:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
