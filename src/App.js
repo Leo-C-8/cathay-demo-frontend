@@ -4,6 +4,7 @@ import UploadPage from "./UploadPage";
 import { Box, Snackbar, Alert } from "@mui/material";
 
 export default function App() {
+  const [userName, setUserName] = useState(localStorage.getItem("userName") || null);
   const [jwtToken, setJwtToken] = useState(localStorage.getItem("jwtToken") || null);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -20,12 +21,23 @@ export default function App() {
     }
   }, [jwtToken]);
 
-  const handleLoginSuccess = (token) => {
+  // 當 userName 狀態改變時，將其儲存到 localStorage
+  useEffect(() => {
+    if (userName) {
+      localStorage.setItem("userName", userName);
+    } else {
+      localStorage.removeItem("userName");
+    }
+  }, [userName]);
+
+  const handleLoginSuccess = (userName, token) => {
+    setUserName(userName)
     setJwtToken(token);
+
     // 登入成功後顯示提示
     setSnackbar({
       open: true,
-      message: "登入成功！歡迎使用。",
+      message: `登入成功！歡迎使用，${userName}！`,
       severity: "success",
     });
   };
@@ -65,6 +77,7 @@ export default function App() {
     >
       {jwtToken ? (
         <UploadPage
+          userName={userName}
           jwtToken={jwtToken}
           onLogout={handleLogout}
           onShowMessage={handleShowMessage} // 傳遞給 UploadPage

@@ -34,9 +34,10 @@ export default function LoginPage({ onLoginSuccess }) {
       }
 
       const data = await res.json();
+      const userName = data.userName;
       const token = data.token;
       if (token) {
-        onLoginSuccess(token);
+        onLoginSuccess(userName, token);
       }
     } catch (err) {
       setError(err.message);
@@ -78,7 +79,7 @@ export default function LoginPage({ onLoginSuccess }) {
     <Card sx={{ width: 400, borderRadius: 2, boxShadow: 3 }}>
       <CardContent>
         <Typography variant="h5" align="center" gutterBottom>
-          圖片壓縮系統
+          圖片壓縮
         </Typography>
         <Typography variant="subtitle1" align="center" gutterBottom>
           {isRegistering ? "註冊新帳號" : "請登入以繼續"}
@@ -114,24 +115,48 @@ export default function LoginPage({ onLoginSuccess }) {
         <Box mt={2}>
           <Button
             variant="contained"
-            color="primary"
             onClick={isRegistering ? handleRegister : handleLogin}
             fullWidth
-            sx={{ borderRadius: 2 }}
+            sx={{
+              borderRadius: 2,
+              backgroundColor: 'rgba(100, 180, 255, 0.2)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(100, 180, 255, 0.4)',
+              boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
+              color: '#003366',
+              textTransform: 'none',
+              transition: '0.3s',
+              '&:hover': {
+                backgroundColor: 'rgba(100, 180, 255, 0.3)',
+              },
+            }}
           >
             {isRegistering ? "註冊" : "登入"}
           </Button>
+
         </Box>
         <Box mt={1} textAlign="center">
           <Button
             variant="contained"
-            color="warning"
             onClick={() => setIsRegistering(!isRegistering)}
             fullWidth
-            sx={{ borderRadius: 2 }}
+            sx={{
+              borderRadius: 2,
+              backgroundColor: 'rgba(200, 150, 255, 0.2)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(200, 150, 255, 0.4)',
+              boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
+              color: '#4B0082',
+              textTransform: 'none',
+              transition: '0.3s',
+              '&:hover': {
+                backgroundColor: 'rgba(200, 150, 255, 0.3)',
+              },
+            }}
           >
             {isRegistering ? "返回登入" : "沒有帳號？點此註冊"}
           </Button>
+
         </Box>
         {error && (
           <Alert severity="error" sx={{ mt: 2, whiteSpace: "pre-wrap" }}>

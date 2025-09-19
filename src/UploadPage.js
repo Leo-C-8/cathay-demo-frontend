@@ -16,7 +16,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import { API_BASE_URL_IMAGE } from './config';
 
-export default function UploadPage({ jwtToken, onLogout, onShowMessage = () => { } }) {
+export default function UploadPage({ userName, jwtToken, onLogout, onShowMessage = () => { } }) {
     const [file, setFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
     const [uploadProgress, setUploadProgress] = useState(0);
@@ -154,11 +154,28 @@ export default function UploadPage({ jwtToken, onLogout, onShowMessage = () => {
             <CardContent>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                     <Typography variant="h5" gutterBottom>
-                        圖片上傳與管理
+                        圖片上傳與管理 {userName ? `｜使用者：${userName}` : ''}
                     </Typography>
-                    <Button variant="outlined" color="error" onClick={onLogout}>
+                    <Button
+                        variant="outlined"
+                        onClick={onLogout}
+                        sx={{
+                            borderRadius: 2,
+                            backgroundColor: 'rgba(255, 100, 100, 0.2)',
+                            backdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(255, 100, 100, 0.4)',
+                            boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
+                            color: '#8B0000',
+                            textTransform: 'none',
+                            transition: '0.3s',
+                            '&:hover': {
+                                backgroundColor: 'rgba(255, 100, 100, 0.3)',
+                            },
+                        }}
+                    >
                         登出
                     </Button>
+
                 </Box>
                 <Divider sx={{ my: 2 }} />
 
@@ -168,6 +185,19 @@ export default function UploadPage({ jwtToken, onLogout, onShowMessage = () => {
                     <Button
                         variant="contained"
                         component="label"
+                        sx={{
+                            borderRadius: 2,
+                            backgroundColor: 'rgba(100, 180, 255, 0.2)',
+                            backdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(100, 180, 255, 0.4)',
+                            boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
+                            color: '#003366',
+                            textTransform: 'none',
+                            transition: '0.3s',
+                            '&:hover': {
+                                backgroundColor: 'rgba(100, 180, 255, 0.3)',
+                            },
+                        }}
                     >
                         選擇檔案
                         <input
@@ -177,6 +207,7 @@ export default function UploadPage({ jwtToken, onLogout, onShowMessage = () => {
                             accept="image/*"
                         />
                     </Button>
+
                     {file && (
                         <Box display="flex" alignItems="center" mt={1}>
                             <Typography variant="body1">
@@ -201,10 +232,22 @@ export default function UploadPage({ jwtToken, onLogout, onShowMessage = () => {
 
                 <Button
                     variant="contained"
-                    color="primary"
                     onClick={handleUpload}
                     fullWidth
                     disabled={!file}
+                    sx={{
+                        borderRadius: 2,
+                        backgroundColor: 'rgba(60, 180, 120, 0.12)', // 更暗的透明綠
+                        backdropFilter: 'blur(8px)',
+                        border: '1px solid rgba(60, 180, 120, 0.3)',
+                        boxShadow: '0 2px 20px rgba(0, 0, 0, 0.08)',
+                        color: '#006400', // 深綠文字
+                        textTransform: 'none',
+                        transition: '0.3s',
+                        '&:hover': {
+                            backgroundColor: 'rgba(60, 180, 120, 0.2)',
+                        },
+                    }}
                 >
                     開始上傳
                 </Button>
