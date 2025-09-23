@@ -26,6 +26,7 @@ export default function UploadPage({ userName, jwtToken, onLogout, onShowMessage
     // 頁面載入時，自動取得圖片清單
     useEffect(() => {
         fetchImageList();
+        // eslint-disable-next-line
     }, []);
 
     // 處理圖片預覽URL的創建和清理
@@ -137,6 +138,43 @@ export default function UploadPage({ userName, jwtToken, onLogout, onShowMessage
         } catch (err) {
             setError(err.message);
             onShowMessage("無法取得圖片清單。", "error");
+        }
+    };
+
+    const handleDownload = async (fileName, originalFileName) => {
+        try {
+            const url = `${API_BASE_URL_IMAGE}/images/download/${fileName}`;
+            const res = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    "Authorization": `Bearer ${jwtToken}`,
+                },
+            });
+
+            if (res.status === 403) {
+                onLogout();
+                onShowMessage("您的登入狀態已過期，請重新登入。", "error");
+                return;
+            }
+
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+            }
+
+            const blob = await res.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.setAttribute('download', originalFileName); // 使用 originalFileName
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(downloadUrl);
+            onShowMessage("圖片下載成功！", "success");
+
+        } catch (err) {
+            onShowMessage("下載過程中發生錯誤。", "error");
+            setError(err.message);
         }
     };
 
@@ -281,17 +319,17 @@ export default function UploadPage({ userName, jwtToken, onLogout, onShowMessage
                                     <ListItemText
                                         primary={item.originalFileName}
                                         secondary={`
-                      大小: ${formatBytes(item.fileSize)} |
-                      上傳日期: ${new Date(item.uploadDate).toLocaleDateString()} |
-                      縮圖狀態: ${item.thumbnailStatus === "completed" ? "✅ 完成" : "⏳ 處理中"}
-                    `}
+                                        大小: ${formatBytes(item.fileSize)} |
+                                        上傳日期: ${new Date(item.uploadDate).toLocaleDateString()} |
+                                        縮圖狀態: ${item.thumbnailStatus === "completed" ? "✅ 完成" : "⏳ 處理中"}
+                                    `}
                                     />
+
                                     <Button
                                         variant="outlined"
                                         color="success"
-                                        href={item.thumbnailDownloadLink}
+                                        onClick={() => handleDownload(item.fileName, item.originalFileName)} // 這裡我們傳入兩個參數
                                         disabled={item.thumbnailStatus !== "completed"}
-                                        target="_blank"
                                     >
                                         下載縮圖
                                     </Button>
