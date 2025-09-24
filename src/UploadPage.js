@@ -141,14 +141,16 @@ export default function UploadPage({ userName, jwtToken, onLogout, onShowMessage
         }
     };
 
-    const handleDownload = async (fileName, originalFileName) => {
+    const handleDownload = async (fileName, originalFileName, folderName) => {
         try {
-            const url = `${API_BASE_URL_IMAGE}/images/download/${fileName}`;
+            const url = `${API_BASE_URL_IMAGE}/images/download`;
             const res = await fetch(url, {
-                method: 'GET',
+                method: 'POST',
                 headers: {
                     "Authorization": `Bearer ${jwtToken}`,
+                    "Content-Type": "application/json",
                 },
+                body: JSON.stringify({ fileName, folderName }),
             });
 
             if (res.status === 403) {
@@ -165,7 +167,7 @@ export default function UploadPage({ userName, jwtToken, onLogout, onShowMessage
             const downloadUrl = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = downloadUrl;
-            link.setAttribute('download', originalFileName); // 使用 originalFileName
+            link.setAttribute('download', originalFileName);
             document.body.appendChild(link);
             link.click();
             link.remove();
@@ -174,6 +176,39 @@ export default function UploadPage({ userName, jwtToken, onLogout, onShowMessage
 
         } catch (err) {
             onShowMessage("下載過程中發生錯誤。", "error");
+            setError(err.message);
+        }
+    };
+
+    // 新增：處理圖片刪除
+    const handleDelete = async (fileName) => {
+        if (!window.confirm("確定要刪除這張圖片嗎？")) {
+            return;
+        }
+
+        try {
+            const url = `${API_BASE_URL_IMAGE}/images/delete/${fileName}`;
+            const res = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    "Authorization": `Bearer ${jwtToken}`,
+                },
+            });
+
+            if (res.status === 403) {
+                onLogout();
+                onShowMessage("您的登入狀態已過期，請重新登入。", "error");
+                return;
+            }
+
+            if (res.status === 204) {
+                onShowMessage("圖片刪除成功！", "success");
+                fetchImageList(); // 刪除成功後重新載入清單
+            } else {
+                throw new Error(`HTTP ${res.status}`);
+            }
+        } catch (err) {
+            onShowMessage("刪除過程中發生錯誤。", "error");
             setError(err.message);
         }
     };
@@ -188,7 +223,7 @@ export default function UploadPage({ userName, jwtToken, onLogout, onShowMessage
     };
 
     return (
-        <Card sx={{ width: 600, borderRadius: 2, boxShadow: 3 }}>
+        <Card sx={{ width: 800, borderRadius: 2, boxShadow: 3 }}>
             <CardContent>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                     <Typography variant="h5" gutterBottom>
@@ -213,7 +248,6 @@ export default function UploadPage({ userName, jwtToken, onLogout, onShowMessage
                     >
                         登出
                     </Button>
-
                 </Box>
                 <Divider sx={{ my: 2 }} />
 
@@ -275,11 +309,11 @@ export default function UploadPage({ userName, jwtToken, onLogout, onShowMessage
                     disabled={!file}
                     sx={{
                         borderRadius: 2,
-                        backgroundColor: 'rgba(60, 180, 120, 0.12)', // 更暗的透明綠
+                        backgroundColor: 'rgba(60, 180, 120, 0.12)',
                         backdropFilter: 'blur(8px)',
                         border: '1px solid rgba(60, 180, 120, 0.3)',
                         boxShadow: '0 2px 20px rgba(0, 0, 0, 0.08)',
-                        color: '#006400', // 深綠文字
+                        color: '#006400',
                         textTransform: 'none',
                         transition: '0.3s',
                         '&:hover': {
@@ -319,20 +353,37 @@ export default function UploadPage({ userName, jwtToken, onLogout, onShowMessage
                                     <ListItemText
                                         primary={item.originalFileName}
                                         secondary={`
-                                        大小: ${formatBytes(item.fileSize)} |
-                                        上傳日期: ${new Date(item.uploadDate).toLocaleDateString()} |
-                                        縮圖狀態: ${item.thumbnailStatus === "completed" ? "✅ 完成" : "⏳ 處理中"}
-                                    `}
+                                            大小: ${formatBytes(item.fileSize)} |
+                                            上傳日期: ${new Date(item.uploadDate).toLocaleDateString()} |
+                                            縮圖狀態: ${item.thumbnailStatus === "completed" ? "✅ 完成" : "⏳ 處理中"}
+                                        `}
                                     />
-
-                                    <Button
-                                        variant="outlined"
-                                        color="success"
-                                        onClick={() => handleDownload(item.fileName, item.originalFileName)} // 這裡我們傳入兩個參數
-                                        disabled={item.thumbnailStatus !== "completed"}
-                                    >
-                                        下載縮圖
-                                    </Button>
+                                    {/* 下載與刪除按鈕 */}
+                                    <Box sx={{ display: 'flex', gap: 1 }}>
+                                        <Button
+                                            variant="outlined"
+                                            color="primary"
+                                            onClick={() => handleDownload(item.fileName, item.originalFileName, "original")}
+                                            disabled={item.thumbnailStatus !== "completed"}
+                                        >
+                                            下載原圖
+                                        </Button>
+                                        <Button
+                                            variant="outlined"
+                                            color="success"
+                                            onClick={() => handleDownload(item.fileName, item.originalFileName, "thumbnail")}
+                                            disabled={item.thumbnailStatus !== "completed"}
+                                        >
+                                            下載縮圖
+                                        </Button>
+                                        <Button
+                                            variant="outlined"
+                                            color="error"
+                                            onClick={() => handleDelete(item.fileName)}
+                                        >
+                                            刪除
+                                        </Button>
+                                    </Box>
                                 </ListItem>
                                 {index < imageList.length - 1 && <Divider component="li" />}
                             </React.Fragment>
