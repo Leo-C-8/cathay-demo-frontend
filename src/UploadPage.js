@@ -20,7 +20,10 @@ export default function UploadPage({ userName, jwtToken, onLogout, onShowMessage
     const [file, setFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
     const [uploadProgress, setUploadProgress] = useState(0);
+    // 圖片清單陣列
     const [imageList, setImageList] = useState([]);
+    // 圖片總數 (新增)
+    const [imageCount, setImageCount] = useState(0);
     const [error, setError] = useState(null);
 
     // 頁面載入時，自動取得圖片清單
@@ -134,7 +137,9 @@ export default function UploadPage({ userName, jwtToken, onLogout, onShowMessage
             }
 
             const data = await res.json();
-            setImageList(data.files || []);
+            // 根據您的 ImageInfoListDto 結構，取得 files 和 imageCount
+            setImageList(data.files || []); // 更新圖片清單
+            setImageCount(data.imageCount || 0); // 更新圖片總數
         } catch (err) {
             setError(err.message);
             onShowMessage("無法取得圖片清單。", "error");
@@ -180,7 +185,7 @@ export default function UploadPage({ userName, jwtToken, onLogout, onShowMessage
         }
     };
 
-    // 新增：處理圖片刪除
+    // 圖片刪除
     const handleDelete = async (fileName) => {
         if (!window.confirm("確定要刪除這張圖片嗎？")) {
             return;
@@ -340,54 +345,99 @@ export default function UploadPage({ userName, jwtToken, onLogout, onShowMessage
                 <Divider sx={{ my: 2 }} />
 
                 {/* 圖片清單 */}
-                <Typography variant="h6">圖片清單</Typography>
+                <Typography variant="h6">
+                    圖片清單
+                    <Box component="span" sx={{ ml: 1, color: 'primary.main' }}>
+                        (總數量: {imageCount}) {/* 顯示總數量 */}
+                    </Box>
+                </Typography>
                 {imageList.length === 0 && !error ? (
                     <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
                         目前沒有已上傳的圖片。
                     </Typography>
                 ) : (
                     <List>
-                        {imageList.map((item, index) => (
-                            <React.Fragment key={index}>
-                                <ListItem>
-                                    <ListItemText
-                                        primary={item.originalFileName}
-                                        secondary={`
-                                            大小: ${formatBytes(item.fileSize)} |
-                                            上傳日期: ${new Date(item.uploadDate).toLocaleDateString()} |
-                                            縮圖狀態: ${item.thumbnailStatus === "completed" ? "✅ 完成" : "⏳ 處理中"}
-                                        `}
-                                    />
-                                    {/* 下載與刪除按鈕 */}
-                                    <Box sx={{ display: 'flex', gap: 1 }}>
-                                        <Button
-                                            variant="outlined"
-                                            color="primary"
-                                            onClick={() => handleDownload(item.fileName, item.originalFileName, "original")}
-                                            disabled={item.thumbnailStatus !== "completed"}
-                                        >
-                                            下載原圖
-                                        </Button>
-                                        <Button
-                                            variant="outlined"
-                                            color="success"
-                                            onClick={() => handleDownload(item.fileName, item.originalFileName, "thumbnail")}
-                                            disabled={item.thumbnailStatus !== "completed"}
-                                        >
-                                            下載縮圖
-                                        </Button>
-                                        <Button
-                                            variant="outlined"
-                                            color="error"
-                                            onClick={() => handleDelete(item.fileName)}
-                                        >
-                                            刪除
-                                        </Button>
-                                    </Box>
-                                </ListItem>
-                                {index < imageList.length - 1 && <Divider component="li" />}
-                            </React.Fragment>
-                        ))}
+                        {imageList.map((item, index) => {
+                            // 判斷壓縮大小顯示內容 (使用小寫 'completed')
+                            const isCompleted = item.thumbnailStatus === "completed";
+                            const compressedSizeText = (item.fileSize > 0 && isCompleted)
+                                ? formatBytes(item.fileSize)
+                                : "壓縮中";
+
+                            // 準備原始尺寸資訊
+                            const originalSizeText = formatBytes(item.originalFileSize);
+
+                            return (
+                                <React.Fragment key={index}>
+                                    <ListItem alignItems="flex-start" sx={{ py: 1.5 }}>
+                                        <ListItemText
+                                            primary={item.originalFileName}
+                                            // 移除尺寸資訊，只保留日期和狀態
+                                            secondary={
+                                                <Box component="span">
+                                                    <Typography
+                                                        component="span"
+                                                        variant="body2"
+                                                        color="text.primary"
+                                                    >
+                                                        上傳日期: {new Date(item.uploadDate).toLocaleDateString()}
+                                                    </Typography>
+                                                    <Typography component="span" variant="body2" sx={{ ml: 2 }}>
+                                                        縮圖狀態: {isCompleted ? "✅ 完成" : "⏳ 處理中"}
+                                                    </Typography>
+                                                </Box>
+                                            }
+                                        />
+                                        {/* 下載與刪除按鈕，並將大小資訊放在按鈕內 */}
+                                        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                                            <Button
+                                                variant="outlined"
+                                                color="primary"
+                                                onClick={() => handleDownload(item.fileName, item.originalFileName, "original")}
+                                                // 讓按鈕內容換行，增加高度
+                                                sx={{ height: 'auto', minWidth: 100, textTransform: 'none', py: 0.5 }}
+                                            >
+                                                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                                    <Typography variant="body2" component="div">
+                                                        下載原圖
+                                                    </Typography>
+                                                    <Typography variant="caption" component="div" sx={{ fontWeight: 'bold' }}>
+                                                        ({originalSizeText}) {/* 原始大小 */}
+                                                    </Typography>
+                                                </Box>
+                                            </Button>
+                                            <Button
+                                                variant="outlined"
+                                                color="success"
+                                                onClick={() => handleDownload(item.fileName, item.originalFileName, "thumbnail")}
+                                                disabled={!isCompleted} // 只有完成才可下載縮圖
+                                                // 讓按鈕內容換行，增加高度
+                                                sx={{ height: 'auto', minWidth: 100, textTransform: 'none', py: 0.5 }}
+                                            >
+                                                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                                    <Typography variant="body2" component="div">
+                                                        下載縮圖
+                                                    </Typography>
+                                                    <Typography variant="caption" component="div" sx={{ fontWeight: 'bold' }}>
+                                                        ({compressedSizeText}) {/* 壓縮大小/壓縮中 */}
+                                                    </Typography>
+                                                </Box>
+                                            </Button>
+                                            <Button
+                                                variant="outlined"
+                                                color="error"
+                                                onClick={() => handleDelete(item.fileName)}
+                                                size="small" // 刪除按鈕維持單行
+                                                sx={{ height: 40 }}
+                                            >
+                                                刪除
+                                            </Button>
+                                        </Box>
+                                    </ListItem>
+                                    {index < imageList.length - 1 && <Divider component="li" />}
+                                </React.Fragment>
+                            );
+                        })}
                     </List>
                 )}
             </CardContent>
