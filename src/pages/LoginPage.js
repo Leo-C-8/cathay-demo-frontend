@@ -8,7 +8,10 @@ import {
   Typography,
   Box,
   Alert,
+  Avatar,
 } from "@mui/material";
+
+import Logo from '../images/Logo.png';
 
 // 主要組件：登入/註冊頁面
 export default function LoginPage({ onLoginSuccess, onLogout, onShowMessage }) {
@@ -77,102 +80,121 @@ export default function LoginPage({ onLoginSuccess, onLogout, onShowMessage }) {
 
   // 渲染組件
   return (
-    <Card sx={{ width: 400, borderRadius: 2, boxShadow: 3 }}>
-      <CardContent>
-        <Typography variant="h5" align="center" gutterBottom>
-          圖片壓縮服務
-        </Typography>
-        <Typography variant="subtitle1" align="center" gutterBottom>
-          {isRegistering ? "註冊新帳號" : "請登入以繼續"}
-        </Typography>
-        {/* 帳號輸入框 */}
-        <TextField
-          label="帳號"
-          variant="outlined"
-          value={account}
-          onChange={(e) => setAccount(e.target.value)}
-          fullWidth
-          margin="normal"
+    <>
+      <Box mb={4} sx={{ textAlign: "center" }}>
+        <Avatar
+          src={Logo}
+          alt="Logo"
+          sx={{
+            width: 120, // 圓形大小
+            height: 120,
+            boxShadow: '0 0 0 5px rgba(255, 255, 255, 0.5), 0 0 20px rgba(0, 150, 255, 0.5)', // 裝飾性邊框和陰影
+            transition: '0.3s',
+            '&:hover': {
+                transform: 'scale(1.05)',
+                boxShadow: '0 0 0 8px rgba(255, 255, 255, 0.7), 0 0 30px rgba(0, 150, 255, 0.8)',
+            }
+          }}
         />
-        {/* 密碼輸入框 */}
-        <TextField
-          label="密碼"
-          type="password"
-          variant="outlined"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          fullWidth
-          margin="normal"
-        />
-        {/* 確認密碼輸入框 (僅在註冊模式下顯示) */}
-        {isRegistering && (
+      </Box>
+
+      <Card sx={{ width: 400, borderRadius: 2, boxShadow: 3 }}>
+        <CardContent>
+          <Typography variant="h5" align="center" gutterBottom>
+            圖片壓縮服務
+          </Typography>
+          <Typography variant="subtitle1" align="center" gutterBottom>
+            {isRegistering ? "註冊新帳號" : "請登入以繼續"}
+          </Typography>
+          {/* 帳號輸入框 */}
           <TextField
-            label="確認密碼"
-            type="password"
+            label="帳號"
             variant="outlined"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            value={account}
+            onChange={(e) => setAccount(e.target.value)}
             fullWidth
             margin="normal"
           />
-        )}
-        <Box mt={2}>
-          {/* 登入/註冊主按鈕 */}
-          <Button
-            variant="contained"
-            onClick={isRegistering ? handleRegister : handleLogin} // 根據模式切換處理函式
+          {/* 密碼輸入框 */}
+          <TextField
+            label="密碼"
+            type="password"
+            variant="outlined"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             fullWidth
-            // 自定義樣式
-            sx={{
-              borderRadius: 2,
-              backgroundColor: 'rgba(100, 180, 255, 0.2)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(100, 180, 255, 0.4)',
-              boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
-              color: '#003366',
-              textTransform: 'none',
-              transition: '0.3s',
-              '&:hover': {
-                backgroundColor: 'rgba(100, 180, 255, 0.3)',
-              },
-            }}
-          >
-            {isRegistering ? "註冊" : "登入"}
-          </Button>
+            margin="normal"
+          />
+          {/* 確認密碼輸入框 (僅在註冊模式下顯示) */}
+          {isRegistering && (
+            <TextField
+              label="確認密碼"
+              type="password"
+              variant="outlined"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              fullWidth
+              margin="normal"
+            />
+          )}
+          <Box mt={2}>
+            {/* 登入/註冊主按鈕 */}
+            <Button
+              variant="contained"
+              onClick={isRegistering ? handleRegister : handleLogin} // 根據模式切換處理函式
+              fullWidth
+              // 自定義樣式
+              sx={{
+                borderRadius: 2,
+                backgroundColor: 'rgba(100, 180, 255, 0.2)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(100, 180, 255, 0.4)',
+                boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
+                color: '#003366',
+                textTransform: 'none',
+                transition: '0.3s',
+                '&:hover': {
+                  backgroundColor: 'rgba(100, 180, 255, 0.3)',
+                },
+              }}
+            >
+              {isRegistering ? "註冊" : "登入"}
+            </Button>
 
-        </Box>
-        <Box mt={1} textAlign="center">
-          {/* 模式切換按鈕 (註冊/返回登入) */}
-          <Button
-            variant="contained"
-            onClick={() => setIsRegistering(!isRegistering)}
-            fullWidth
-            // 自定義樣式
-            sx={{
-              borderRadius: 2,
-              backgroundColor: 'rgba(200, 150, 255, 0.2)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(200, 150, 255, 0.4)',
-              boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
-              color: '#4B0082',
-              textTransform: 'none',
-              transition: '0.3s',
-              '&:hover': {
-                backgroundColor: 'rgba(200, 150, 255, 0.3)',
-              },
-            }}
-          >
-            {isRegistering ? "返回登入" : "沒有帳號？點此註冊"}
-          </Button>
+          </Box>
+          <Box mt={1} textAlign="center">
+            {/* 模式切換按鈕 (註冊/返回登入) */}
+            <Button
+              variant="contained"
+              onClick={() => setIsRegistering(!isRegistering)}
+              fullWidth
+              // 自定義樣式
+              sx={{
+                borderRadius: 2,
+                backgroundColor: 'rgba(200, 150, 255, 0.2)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(200, 150, 255, 0.4)',
+                boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
+                color: '#4B0082',
+                textTransform: 'none',
+                transition: '0.3s',
+                '&:hover': {
+                  backgroundColor: 'rgba(200, 150, 255, 0.3)',
+                },
+              }}
+            >
+              {isRegistering ? "返回登入" : "沒有帳號？點此註冊"}
+            </Button>
 
-        </Box>
-        {/* 錯誤訊息提示 */}
-        {error && (
-          <Alert severity="error" sx={{ mt: 2, whiteSpace: "pre-wrap" }}>
-            {error}
-          </Alert>
-        )}
-      </CardContent>
-    </Card>
+          </Box>
+          {/* 錯誤訊息提示 */}
+          {error && (
+            <Alert severity="error" sx={{ mt: 2, whiteSpace: "pre-wrap" }}>
+              {error}
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
+    </>
   );
 }
