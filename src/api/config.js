@@ -1,3 +1,9 @@
-export const API_BASE_URL_ACCOUNT = '/account';
+const isLocalhost = window.location.hostname === 'localhost';
 
-export const API_BASE_URL_IMAGE = '/image';
+export const API_BASE_URL_ACCOUNT = isLocalhost
+    ? 'http://localhost:8080'
+    : '/account';
+
+export const API_BASE_URL_IMAGE = isLocalhost
+    ? 'http://localhost:8081'
+    : '/image';

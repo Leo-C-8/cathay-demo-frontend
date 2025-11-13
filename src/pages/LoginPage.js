@@ -9,6 +9,7 @@ import {
   Box,
   Alert,
   Avatar,
+  Paper,
 } from "@mui/material";
 
 import Logo from '../images/Logo.png';
@@ -80,15 +81,25 @@ export default function LoginPage({ onLoginSuccess, onLogout, onShowMessage }) {
 
   // 渲染組件
   return (
-    <>
+    <Paper
+      elevation={0}
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        p: 5,
+      }}
+    >
+      {/* 標誌 (Logo) 區塊 */}
       <Box mb={4} sx={{ textAlign: "center" }}>
         <Avatar
           src={Logo}
           alt="Logo"
           sx={{
-            width: 120, // 圓形大小
+            width: 120,
             height: 120,
-            boxShadow: '0 0 0 5px rgba(255, 255, 255, 0.5), 0 0 20px rgba(0, 150, 255, 0.5)', // 裝飾性邊框和陰影
+            boxShadow: '0 0 0 5px rgba(255, 255, 255, 0.5), 0 0 20px rgba(0, 150, 255, 0.5)',
             transition: '0.3s',
             '&:hover': {
                 transform: 'scale(1.05)',
@@ -98,103 +109,131 @@ export default function LoginPage({ onLoginSuccess, onLogout, onShowMessage }) {
         />
       </Box>
 
-      <Card sx={{ width: 400, borderRadius: 2, boxShadow: 3 }}>
+      {/* 登入/註冊卡片 */}
+      <Card
+        sx={{
+          width: 400,
+          maxWidth: '90%',
+          maxHeight: '90%',
+          borderRadius: 4,
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.15)',
+          p: 1,
+        }}
+      >
         <CardContent>
-          <Typography variant="h5" align="center" gutterBottom>
-            圖片壓縮服務
+          {/* 標題 */}
+          <Typography
+            variant="h4"
+            align="center"
+            gutterBottom
+            sx={{ fontWeight: 600, color: '#333' }}
+          >
+            圖片壓縮
           </Typography>
-          <Typography variant="subtitle1" align="center" gutterBottom>
-            {isRegistering ? "註冊新帳號" : "請登入以繼續"}
+          <Typography
+            variant="subtitle1"
+            align="center"
+            gutterBottom
+            sx={{ mb: 3, color: '#666' }}
+          >
+            {isRegistering ? "創建您的新帳號" : "請登入以開始使用"}
           </Typography>
+
           {/* 帳號輸入框 */}
           <TextField
-            label="帳號"
+            label="帳號 (UserName)"
             variant="outlined"
             value={account}
             onChange={(e) => setAccount(e.target.value)}
             fullWidth
             margin="normal"
+            size="medium"
           />
           {/* 密碼輸入框 */}
           <TextField
-            label="密碼"
+            label="密碼 (Password)"
             type="password"
             variant="outlined"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             fullWidth
             margin="normal"
+            size="medium"
           />
           {/* 確認密碼輸入框 (僅在註冊模式下顯示) */}
           {isRegistering && (
             <TextField
-              label="確認密碼"
+              label="確認密碼 (Confirm Password)"
               type="password"
               variant="outlined"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               fullWidth
               margin="normal"
+              size="medium"
             />
           )}
-          <Box mt={2}>
+
+          <Box mt={3}>
             {/* 登入/註冊主按鈕 */}
             <Button
               variant="contained"
-              onClick={isRegistering ? handleRegister : handleLogin} // 根據模式切換處理函式
+              onClick={isRegistering ? handleRegister : handleLogin}
               fullWidth
-              // 自定義樣式
+              size="medium"
               sx={{
                 borderRadius: 2,
-                backgroundColor: 'rgba(100, 180, 255, 0.2)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(100, 180, 255, 0.4)',
-                boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
-                color: '#003366',
+                backgroundColor: 'rgba(50, 150, 255, 0.7)',
+                backdropFilter: 'blur(5px)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+                color: 'white',
+                fontWeight: 700,
                 textTransform: 'none',
                 transition: '0.3s',
                 '&:hover': {
-                  backgroundColor: 'rgba(100, 180, 255, 0.3)',
+                  backgroundColor: 'rgba(50, 150, 255, 0.9)',
+                  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.5)',
+                  transform: 'translateY(-1px)',
                 },
               }}
             >
-              {isRegistering ? "註冊" : "登入"}
+              {isRegistering ? "完成註冊並登入" : "登入"}
             </Button>
-
           </Box>
-          <Box mt={1} textAlign="center">
-            {/* 模式切換按鈕 (註冊/返回登入) */}
+
+          <Box mt={2} textAlign="center">
             <Button
-              variant="contained"
+              variant="text"
               onClick={() => setIsRegistering(!isRegistering)}
               fullWidth
-              // 自定義樣式
+              size="medium"
               sx={{
                 borderRadius: 2,
-                backgroundColor: 'rgba(200, 150, 255, 0.2)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(200, 150, 255, 0.4)',
-                boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
-                color: '#4B0082',
+                color: isRegistering ? '#4B0082' : '#007ACC',
+                fontWeight: 500,
                 textTransform: 'none',
                 transition: '0.3s',
                 '&:hover': {
-                  backgroundColor: 'rgba(200, 150, 255, 0.3)',
+                    backgroundColor: 'rgba(150, 100, 255, 0.1)',
                 },
               }}
             >
-              {isRegistering ? "返回登入" : "沒有帳號？點此註冊"}
+              {isRegistering ? "已有帳號？返回登入" : "沒有帳號？點此註冊"}
             </Button>
-
           </Box>
+
           {/* 錯誤訊息提示 */}
           {error && (
-            <Alert severity="error" sx={{ mt: 2, whiteSpace: "pre-wrap" }}>
+            <Alert
+              severity="error"
+              sx={{ mt: 3, whiteSpace: "pre-wrap", borderRadius: 2 }}
+            >
               {error}
             </Alert>
           )}
         </CardContent>
       </Card>
-    </>
+    </Paper>
   );
 }

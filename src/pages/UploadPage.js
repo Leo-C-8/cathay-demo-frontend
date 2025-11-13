@@ -260,20 +260,22 @@ export default function UploadPage({ userName, jwtToken, onLogout, onShowMessage
                         圖片上傳與管理 {userName ? `｜使用者：${userName}` : ''}
                     </Typography>
                     <Button
-                        variant="outlined"
+                        variant="contained"
                         onClick={onLogout}
-                        // 自定義登出按鈕樣式
                         sx={{
                             borderRadius: 2,
-                            backgroundColor: 'rgba(255, 100, 100, 0.2)',
-                            backdropFilter: 'blur(10px)',
-                            border: '1px solid rgba(255, 100, 100, 0.4)',
-                            boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
-                            color: '#8B0000',
+                            backgroundColor: 'rgba(254, 23, 23, 0.5)',
+                            backdropFilter: 'blur(8px)',
+                            border: '1px solid rgba(255, 255, 255, 0.5)',
+                            boxShadow: '0 8px 32px 0 rgba(255, 100, 100, 0.3)',
+                            color: 'white',
+                            fontWeight: 700,
                             textTransform: 'none',
                             transition: '0.3s',
                             '&:hover': {
-                                backgroundColor: 'rgba(255, 100, 100, 0.3)',
+                                backgroundColor: 'rgba(255, 80, 80, 0.7)',
+                                boxShadow: '0 8px 32px 0 rgba(255, 100, 100, 0.6)',
+                                transform: 'translateY(-2px)',
                             },
                         }}
                     >
@@ -289,20 +291,29 @@ export default function UploadPage({ userName, jwtToken, onLogout, onShowMessage
                     <Button
                         variant="contained"
                         component="label"
-                        disabled={isUploading} // 上傳中禁用
-                        // 自定義選擇檔案按鈕樣式
+                        disabled={isUploading}
                         sx={{
                             borderRadius: 2,
-                            backgroundColor: 'rgba(100, 180, 255, 0.2)',
-                            backdropFilter: 'blur(10px)',
-                            border: '1px solid rgba(100, 180, 255, 0.4)',
-                            boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
-                            color: '#003366',
+                            backgroundColor: 'rgba(19, 130, 248, 0.7)',
+                            backdropFilter: 'blur(8px)',
+                            border: '1px solid rgba(255, 255, 255, 0.5)',
+                            boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+                            color: 'white',
+                            fontWeight: 700,
                             textTransform: 'none',
                             transition: '0.3s',
                             '&:hover': {
-                                backgroundColor: 'rgba(100, 180, 255, 0.3)',
+                                backgroundColor: 'rgba(50, 150, 255, 0.9)',
+                                boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.5)',
+                                transform: 'translateY(-2px)',
                             },
+                            '&.Mui-disabled': {
+                                backgroundColor: 'rgba(150, 150, 150, 0.5)',
+                                boxShadow: 'none',
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                transform: 'none',
+                                border: '1px solid rgba(255, 255, 255, 0.3)',
+                            }
                         }}
                     >
                         {isUploading ? "請稍候..." : "選擇檔案"}
@@ -311,7 +322,7 @@ export default function UploadPage({ userName, jwtToken, onLogout, onShowMessage
                             hidden
                             onChange={handleFileChange}
                             accept="image/*"
-                            disabled={isUploading} // 上傳中禁用 input
+                            disabled={isUploading}
                         />
                     </Button>
 
@@ -343,20 +354,29 @@ export default function UploadPage({ userName, jwtToken, onLogout, onShowMessage
                     variant="contained"
                     onClick={handleUpload}
                     fullWidth
-                    disabled={!file || isUploading} // 沒有檔案或上傳中時禁用
-                    // 自定義開始上傳按鈕樣式
+                    disabled={!file || isUploading}
                     sx={{
                         borderRadius: 2,
-                        backgroundColor: 'rgba(60, 180, 120, 0.12)',
+                        backgroundColor: 'rgba(104, 224, 74, 0.45)',
                         backdropFilter: 'blur(8px)',
-                        border: '1px solid rgba(60, 180, 120, 0.3)',
-                        boxShadow: '0 2px 20px rgba(0, 0, 0, 0.08)',
-                        color: '#006400',
+                        border: '1px solid rgba(255, 255, 255, 0.5)',
+                        boxShadow: '0 8px 32px 0 rgba(60, 180, 120, 0.4)',
+                        color: 'rgba(24, 63, 43, 0.7)',
+                        fontWeight: 700,
                         textTransform: 'none',
                         transition: '0.3s',
                         '&:hover': {
-                            backgroundColor: 'rgba(60, 180, 120, 0.2)',
+                            backgroundColor: 'rgba(177, 226, 201, 0.9)',
+                            boxShadow: '0 8px 32px 0 rgba(60, 180, 120, 0.81)',
+                            transform: 'translateY(-2px)',
                         },
+                        '&.Mui-disabled': {
+                            backgroundColor: 'rgba(150, 150, 150, 0.5)',
+                            boxShadow: 'none',
+                            color: 'rgba(255, 255, 255, 0.7)',
+                            transform: 'none',
+                            border: '1px solid rgba(255, 255, 255, 0.3)',
+                        }
                     }}
                 >
                     {isUploading ? "正在上傳..." : "開始上傳"}
@@ -434,12 +454,22 @@ export default function UploadPage({ userName, jwtToken, onLogout, onShowMessage
                                                 variant="outlined"
                                                 color="primary"
                                                 onClick={() => handleDownload(item.fileName, item.originalFileName, "original")}
-                                                // 樣式調整
                                                 sx={{
                                                     height: 58,
                                                     minWidth: 150,
                                                     textTransform: 'none',
-                                                    py: 0.5
+                                                    py: 0.5,
+                                                    backgroundColor: 'rgba(50, 150, 255, 0.1)',
+                                                    backdropFilter: 'blur(5px)',
+                                                    border: '1px solid rgba(50, 150, 255, 0.5)',
+                                                    color: '#007ACC',
+                                                    boxShadow: '0 2px 10px rgba(50, 150, 255, 0.2)',
+                                                    transition: '0.3s',
+                                                    '&:hover': {
+                                                        backgroundColor: 'rgba(50, 150, 255, 0.2)',
+                                                        border: '1px solid rgba(50, 150, 255, 0.8)',
+                                                        boxShadow: '0 4px 15px rgba(50, 150, 255, 0.3)',
+                                                    },
                                                 }}
                                                 startIcon={<DownloadIcon />}
                                             >
@@ -453,20 +483,36 @@ export default function UploadPage({ userName, jwtToken, onLogout, onShowMessage
                                                     </Typography>
                                                 </Box>
                                             </Button>
+
                                             {/* 下載縮圖按鈕 */}
                                             <Button
                                                 variant="outlined"
                                                 color="success"
                                                 onClick={() => handleDownload(item.fileName, item.originalFileName, "thumbnail")}
-                                                disabled={!isCompleted} // 只有完成才可下載縮圖
-                                                // 樣式調整
+                                                disabled={!isCompleted}
                                                 sx={{
                                                     height: 58,
                                                     minWidth: 150,
                                                     textTransform: 'none',
-                                                    py: 0.5
+                                                    py: 0.5,
+                                                    backgroundColor: 'rgba(60, 180, 120, 0.1)',
+                                                    backdropFilter: 'blur(5px)',
+                                                    border: '1px solid rgba(60, 180, 120, 0.5)',
+                                                    color: '#388E3C',
+                                                    boxShadow: '0 2px 10px rgba(60, 180, 120, 0.2)',
+                                                    transition: '0.3s',
+                                                    '&:hover': {
+                                                        backgroundColor: 'rgba(60, 180, 120, 0.2)',
+                                                        border: '1px solid rgba(60, 180, 120, 0.8)',
+                                                        boxShadow: '0 4px 15px rgba(60, 180, 120, 0.3)',
+                                                    },
+                                                    '&.Mui-disabled': {
+                                                        color: 'rgba(0, 0, 0, 0.38)',
+                                                        backgroundColor: 'rgba(150, 150, 150, 0.05)',
+                                                        border: '1px solid rgba(150, 150, 150, 0.3)',
+                                                        boxShadow: 'none',
+                                                    }
                                                 }}
-                                                // 處理中顯示載入動畫，完成顯示下載圖標
                                                 startIcon={isCompleted ? <DownloadIcon /> : <CircularProgress size={16} />}
                                             >
                                                 {/* 按鈕文字：縮圖與大小 */}
@@ -479,17 +525,28 @@ export default function UploadPage({ userName, jwtToken, onLogout, onShowMessage
                                                     </Typography>
                                                 </Box>
                                             </Button>
+
                                             {/* 刪除按鈕 */}
                                             <Button
                                                 variant="outlined"
                                                 color="error"
                                                 onClick={() => handleDelete(item.fileName)}
-                                                // 樣式調整
                                                 sx={{
                                                     height: 58,
                                                     minWidth: 150,
                                                     textTransform: 'none',
-                                                    py: 0.5
+                                                    py: 0.5,
+                                                    backgroundColor: 'rgba(255, 100, 100, 0.1)',
+                                                    backdropFilter: 'blur(5px)',
+                                                    border: '1px solid rgba(255, 100, 100, 0.5)',
+                                                    color: '#D32F2F',
+                                                    boxShadow: '0 2px 10px rgba(255, 100, 100, 0.2)',
+                                                    transition: '0.3s',
+                                                    '&:hover': {
+                                                        backgroundColor: 'rgba(255, 100, 100, 0.2)',
+                                                        border: '1px solid rgba(255, 100, 100, 0.8)',
+                                                        boxShadow: '0 4px 15px rgba(255, 100, 100, 0.3)',
+                                                    },
                                                 }}
                                                 startIcon={<DeleteIcon />}
                                             >
